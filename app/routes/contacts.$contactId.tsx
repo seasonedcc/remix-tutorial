@@ -11,15 +11,29 @@ import type { FunctionComponent } from "react"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
 import type { ContactRecord } from "../data"
-import { getContact, updateContact } from "../data"
+import { getContact as dbGetContact, updateContact } from "../data"
 import invariant from "tiny-invariant"
+import { fromSuccess, makeDomainFunction } from "domain-functions"
+import z from "zod"
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
-  invariant(params.contactId, "Missing contactId param")
-  const contact = await getContact(params.contactId)
+const getContactSchema = z.object({
+  contactId: z.string(),
+})
+
+const getContactDF = makeDomainFunction(getContactSchema)(async ({
+  contactId,
+}) => {
+  const contact = await dbGetContact(contactId)
   if (!contact) {
     throw new Response("Not Found", { status: 404 })
   }
+  return contact
+})
+
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  const contact = await fromSuccess(getContactDF)({
+    contactId: params.contactId,
+  })
   return json({ contact })
 }
 
