@@ -1,6 +1,6 @@
 import {
   Form,
-  Link,
+  NavLink,
   Links,
   LiveReload,
   Meta,
@@ -62,8 +62,16 @@ export default function App() {
               <ul>
                 {contacts.map((contact) => (
                   <li key={contact.id}>
-                    <Link to={`contacts/${contact.id}`}>
-                      {contact.first || contact.last ? (
+                  <NavLink
+                  className={({ isActive, isPending }) =>
+                    isActive
+                      ? "active"
+                      : isPending
+                      ? "pending"
+                      : ""
+                  }
+                  to={`contacts/${contact.id}`}
+                >                      {contact.first || contact.last ? (
                         <>
                           {contact.first} {contact.last}
                         </>
@@ -73,7 +81,7 @@ export default function App() {
                       {contact.favorite ? (
                         <span>★</span>
                       ) : null}
-                    </Link>
+                    </NavLink>
                   </li>
                 ))}
               </ul>
