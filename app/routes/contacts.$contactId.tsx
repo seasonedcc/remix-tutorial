@@ -1,4 +1,12 @@
-import { Form, useFetcher, useLoaderData } from "@remix-run/react"
+import {
+  Form,
+  Links,
+  Meta,
+  Scripts,
+  useFetcher,
+  useLoaderData,
+  useRouteError,
+} from "@remix-run/react"
 import type { FunctionComponent } from "react"
 import type { ActionFunctionArgs, LoaderFunctionArgs } from "@remix-run/node"
 import { json } from "@remix-run/node"
@@ -101,5 +109,28 @@ const Favorite: FunctionComponent<{
         {favorite ? "★" : "☆"}
       </button>
     </fetcher.Form>
+  )
+}
+
+export function ErrorBoundary() {
+  const error = useRouteError() as { status?: number; data?: string }
+  console.error(error)
+
+  return (
+    <html>
+      <head>
+        <title>Oh no!</title>
+        <Meta />
+        <Links />
+      </head>
+      <body>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <h1>Oh no!</h1>
+          {error?.status && <p style={{ color: "red" }}>{error?.status}</p>}
+          {error?.data && <p style={{ color: "red" }}>{error?.data}</p>}
+        </div>
+        <Scripts />
+      </body>
+    </html>
   )
 }
